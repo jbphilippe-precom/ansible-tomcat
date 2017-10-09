@@ -1,0 +1,31 @@
+---
+# defaults file for ansible-tomcat
+
+tomcat_port: 8080
+tomcat_bind_address: "127.0.0.1"
+
+tomcat_use_lvm: true
+tomcat_vg_name: vg_vroot
+tomcat_lv_name: lv_tomcat
+tomcat_lv_size: 10g
+
+tomcat_version: 8
+tomcat_datadir: "/var/lib/tomcat{{ tomcat_version }}"
+tomcat_conf_dir: "/etc/tomcat{{ tomcat_version }}"
+tomcat_conf_file: "server.xml"
+tomcat_java_memory: 128m
+
+tomcat_user: "tomcat8"
+tomcat_group: "tomcat8"
+
+tomcat_sql_connector: mysql  # values 'mysql' or 'postgresql'
+tomcat_jdbc_name: ""
+tomcat_jdbc_username: ""
+tomcat_jdbc_pass: ""
+tomcat_jdbc_url: ""
+
+
+
+
+
+

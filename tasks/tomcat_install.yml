@@ -1,0 +1,53 @@
+---
+
+# Use LVM ?
+- include: tomcat_lvm.yml
+  when: ansible_distribution == 'Ubuntu' and ansible_distribution_release == 'xenial' and tomcat_use_lvm == true
+
+#- name: Find Java libraries
+#  shell: find /usr/lib/jvm/ -name '*jre*' | tail -1
+#  register: java_directory
+#  changed_when: false    
+
+
+- name: Copy /etc/default/tomcat{{ tomcat_version }} template
+  template: src=tomcat.j2 dest=/etc/default/tomcat{{ tomcat_version }} owner=root group=root mode=0644
+
+- name: Keep existing /etc/default/tomcat{{ tomcat_version }} file (for debconf)
+  debconf: name='Package configuration' question='Configuring tomcat8' value="keep the local version currently installed" vtype='select'
+
+# Install Tomcat Server
+- name: Install latest tomcat-server
+  apt: name={{ item }} update_cache=yes state=latest
+  with_items:
+    - "tomcat{{ tomcat_version }}"
+    - "tomcat{{ tomcat_version }}-docs"
+    - "tomcat{{ tomcat_version }}-admin"
+    - "tomcat{{ tomcat_version }}-examples"
+
+
+# Check Tomcat running
+#- name: Check if Tomcat running
+#  wait_for: port={{ tomcat_port }} delay=5 timeout=30
+#  register: tomcat_state
+#  ignore_errors: yes
+
+
+# Install lib java for mysql connector
+- name: Install libmysql-java for Tomcat MySQL connector
+  apt: name=libmysql-java state=latest
+  when: tomcat_sql_connector == "mysql"
+
+# Install lib java for mysql connector
+- name: Install libpostgresql-jdbc-java for Tomcat Postgresql connector
+  apt: name=libpostgresql-jdbc-java state=latest
+  when: tomcat_sql_connector == "postgresql"
+
+
+# Configuration 
+- include: tomcat_configure.yml
+
+
+# Create users
+#- include: tomcat_set_users.yml
+

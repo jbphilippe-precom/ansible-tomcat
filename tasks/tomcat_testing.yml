@@ -1,0 +1,15 @@
+---
+# tomcat testing
+
+- shell: "dpkg -l | grep tomcat{{ tomcat_version }}"
+  register: tomcat_installed_version
+  changed_when: false
+
+- name: Display Tomcat Version
+  debug: msg={{ tomcat_installed_version.stdout_lines }}
+
+# tomcat listening 
+- name: Is tomcat server listening ?
+  wait_for: port={{ tomcat_port }} delay=2 timeout=10
+
+

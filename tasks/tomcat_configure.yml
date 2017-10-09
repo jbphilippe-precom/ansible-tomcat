@@ -1,0 +1,20 @@
+---
+
+### Configure Tomcat
+#- name: Set JVM parameters
+#  lineinfile: dest=/etc/default/tomcat{{ tomcat_version }} regexp=JAVA_OPTS="-Djava.awt.headless=true -Xmx{{ tomcat_jvm_memory }}m -XX:+UseConcMarkSweepGC" line="-Djava.awt.headless=true -Xmx{{ tomcat_java_memory }}m -XX:+UseConcMarkSweepGC"
+
+######################
+### Sql Connectors ###
+######################
+- name: Copy tomcat configuration templates
+  template: src={{ item }}.j2 dest={{ tomcat_conf_dir }}/{{ item }} owner=root group=root mode=0644
+  with_items: 
+    - "server.xml"
+    - "context.xml"
+  register: tomcatconfig
+
+- name: Restart Tomcat
+  service: name=tomcat{{ tomcat_version }} state=restarted
+  when: tomcatconfig|changed
+

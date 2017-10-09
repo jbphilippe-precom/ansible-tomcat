@@ -1,0 +1,16 @@
+---
+
+### Create/Resize Tomcat LV
+- name: Create/Resize Tomcat LV
+  lvol: vg={{ tomcat_vg_name }} lv={{ tomcat_lv_name }} size={{ tomcat_lv_size }}
+
+### Create filesystem
+- name: Create ext4 filesystem for tomcat
+  filesystem: fstype=ext4 dev=/dev/{{ tomcat_vg_name }}/{{ tomcat_lv_name }}
+  register: tomcatdatadirformat
+
+### Mount filesystem and create mountpoint in fstab if filesystem created
+- name: Create mounpoint
+  mount: name={{ tomcat_datadir }} src=/dev/mapper/{{ tomcat_vg_name }}-{{ tomcat_lv_name }} fstype=ext4 opts=defaults state=mounted
+  when: tomcatdatadirformat|changed
+
